@@ -47,9 +47,9 @@ int main(int argc, char** argv)
 
     if (argc == 3) {    //Check to make sure the right number of arguments were passed
         output_path = argv[2];
-        output_path_obj = output_path + ".obj";
-        output_path_stl = output_path + ".stl";
-        output_path_csv = output_path + ".csv";
+        output_path_obj = output_path + "_OBB.obj";
+        output_path_stl = output_path + "_OBB.stl";
+        output_path_csv = output_path + "_OBB.csv";
 
         if (output_path.empty()){   //Check to make sure there's a legitimate output specified
             std::cerr << "You didn't specify an output filename. Please use: ./compute-bounding-box.exe <input.obj> <output_filename>" << std::endl;
@@ -88,44 +88,6 @@ int main(int argc, char** argv)
     std::ifstream fin;
     std::string line_in;
     std::string CSV_line;
-
-    /*//Read plane points .csv (whole line)
-    fin.open("Plane-points.csv");
-    while(!fin.eof()){
-        fin>>line_in;
-        CSV_line = CSV_line + " " + line_in;    //This creates a space before the first entry...
-    }
-    CSV_line = ltrim(CSV_line); //This removes the space
-    //std::cout << CSV_line << std::endl;
-
-    //Now, split "CSV_line" by commas
-    std::vector<std::string> split_CSV_line;
-    std::stringstream s_stream(CSV_line);   //Create string stream from the string
-    while(s_stream.good()){
-        std::string sub_str;
-        getline(s_stream, sub_str, ','); //get first string delimited by comma
-        split_CSV_line.push_back(sub_str);
-    }
-
-
-    //Now, we have an array of point_3 points as strings. So each entry in split_csv_line contains a point that looks
-    //like this "X Y Z"
-    //We want to split this into "X" "Y" and "Z" as doubles so we can feed them into creating Point_3 objects.
-
-
-    std::vector<K::Point_3> plane_points; //create an array to store the points extracted from the plane .csv
-    std::vector<std::vector<double>> split_CSV_line_2D(split_CSV_line.size());   //Sub-split version of each line of the csv. It's a stupid name, I know...
-
-    for(int i = 0; i<split_CSV_line.size(); i++){
-        std::stringstream s_stream2(split_CSV_line.at(i));  //Yet another string split
-        while(s_stream2.good()){
-            std::string sub_str2;
-            getline(s_stream2, sub_str2, ' '); //Get first string delimited by space
-            double sub_dbl = std::stod(sub_str2);   //store subsplit entry as a double
-            split_CSV_line_2D[i].push_back(sub_dbl);    //Store the subsplit double 
-        }
-    }
-    */
 
     // Save OBB points to file - Needed for generating Slicer fiducials
     try 
