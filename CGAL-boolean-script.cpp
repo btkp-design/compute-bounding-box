@@ -7,6 +7,7 @@
 #include <iostream>
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
 #include <CGAL/Polygon_mesh_processing/repair.h>
+#include <CGAL/Polygon_mesh_processing/triangulate_hole.h>
 #include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
 #include <CGAL/boost/graph/helpers.h>
 
@@ -69,9 +70,8 @@ bool check_polyhedron_validity(const Polyhedron& poly, const std::string& label)
     }
 
     // Check for self-intersections
-    std::vector<std::pair<Polyhedron::Facet_const_handle, Polyhedron::Facet_const_handle>> self_intersections;
-    if (PMP::does_self_intersect(poly, std::back_inserter(self_intersections))) {
-        std::cerr << label << " has " << self_intersections.size() << " self-intersection(s)." << std::endl;
+    if (PMP::does_self_intersect(poly)) {
+        std::cerr << label << " has self-intersection(s)." << std::endl;
         valid = false;
     }
 
@@ -100,12 +100,10 @@ int main(int argc, char** argv)
 
     // Optionally attempt repair
     if (!poly1.is_closed()) {
-        std::cerr << "Input 1 is not closed. Attempting to close holes..." << std::endl;
-        PMP::close_holes(poly1);
+        std::cerr << "Input 1 is not closed. Cannot repair automatically with current CGAL version." << std::endl;
     }
     if (!poly2.is_closed()) {
-        std::cerr << "Input 2 is not closed. Attempting to close holes..." << std::endl;
-        PMP::close_holes(poly2);
+        std::cerr << "Input 2 is not closed. Cannot repair automatically with current CGAL version." << std::endl;
     }
 
     // Re-check after repair attempt
