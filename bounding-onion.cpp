@@ -1,3 +1,4 @@
+// #include <boost/multiprecision/gmp.hpp>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/OBJ.h>
 #include <CGAL/IO/STL.h>
@@ -31,7 +32,7 @@ std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
     return s;
 }
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
     if (argc < 2) {
         std::cerr << "Please use: ./compute-bounding-box.exe <input.obj> <output_filename>" << std::endl;
@@ -90,18 +91,18 @@ int main(int argc, char** argv)
     std::string CSV_line;
 
     // Save OBB points to file - Needed for generating Slicer fiducials
-    try 
+    try
     {
         std::ofstream myFile(output_path_csv);
         myFile << obb_points[0] << "," << obb_points[1] << "," << obb_points[2] << "," << obb_points[3] <<
                 "," << obb_points[4] << "," << obb_points[5] << "," << obb_points[6] << "," << obb_points[7];
         myFile.close();
     }
-    catch (const std::exception &e) 
+    catch (const std::exception &e)
     {
         std::cerr << "Caught " << e.what() << " while trying to save OBB .csv file" << std::endl;
     }
-    
+
 
     return 0;
 }

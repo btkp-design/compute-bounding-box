@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  build-and-test:
+    name: Build (${{ matrix.os }}, ${{ matrix.optimization }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: bjia56/setup-cosmocc@c0097c34319baeca1b41cc857ec5c643f2f5baf6
+        with:
+          version: "4.0.2"
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Build
+        run: make dependencies compute-bounding-box.exe CXX=cosmoc++ CFLAGS=-Os
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compute-bounding-box-${{ matrix.os }}
+          path: compute-bounding-box.exe
