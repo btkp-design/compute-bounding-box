@@ -21,8 +21,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: bjia56/setup-cosmocc@c0097c34319baeca1b41cc857ec5c643f2f5baf6
+        with:
+          version: "4.0.2"
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
       - name: Build release
-        run: make CXX=g++ CFLAGS="-O3"
+        run: make dependencies compute-bounding-box CXX=cosmoc++ CFLAGS="-O3"
 
       - name: Rename artifact for upload
         run: cp ${{ matrix.artifact_name }} ${{ matrix.asset_name }}
@@ -40,9 +47,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        uses: ./.github/actions/install-dependencies
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4

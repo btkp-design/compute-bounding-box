@@ -19,11 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: bjia56/setup-cosmocc@c0097c34319baeca1b41cc857ec5c643f2f5baf6
+        with:
+          version: "4.0.2"
+
       - name: Install dependencies
         uses: ./.github/actions/install-dependencies
 
       - name: Build
-        run: make CXX=g++ CFLAGS=-O0
+        run: make dependencies compute-bounding-box CXX=cosmoc++ CFLAGS=-Os
 
       - uses: actions/upload-artifact@v4
         with:
