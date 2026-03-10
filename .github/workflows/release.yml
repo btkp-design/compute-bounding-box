@@ -29,7 +29,7 @@ jobs:
         uses: ./.github/actions/install-dependencies
 
       - name: Build release
-        run: make dependencies compute-bounding-box CXX=cosmoc++ CFLAGS="-O3"
+        run: make dependencies compute-bounding-box.exe CXX=cosmoc++ CFLAGS="-O3"
 
       - name: Rename artifact for upload
         run: cp ${{ matrix.artifact_name }} ${{ matrix.asset_name }}

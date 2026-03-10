@@ -27,9 +27,9 @@ jobs:
         uses: ./.github/actions/install-dependencies
 
       - name: Build
-        run: make dependencies compute-bounding-box CXX=cosmoc++ CFLAGS=-Os
+        run: make dependencies compute-bounding-box.exe CXX=cosmoc++ CFLAGS=-Os
 
       - uses: actions/upload-artifact@v4
         with:
           name: compute-bounding-box-${{ matrix.os }}
-          path: compute-bounding-box
+          path: compute-bounding-box.exe
