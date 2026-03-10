@@ -1,0 +1,10 @@
+name: Install dependencies
+description: Installs libcgal, eigen, and boost on Linux and macOS
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y libcgal-dev libeigen3-dev libboost-all-dev
