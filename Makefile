@@ -1,5 +1,6 @@
 CXX=x86_64-w64-mingw32-c++
-CFLAGS := -O3 -std=c++17 -pthread -DCGAL_DO_NOT_USE_BOOST_MP -DCGAL_EIGEN3_ENABLED
+CFLAGS := -O3 
+BUILD_FLAGS = -std=c++17 -pthread -DCGAL_DO_NOT_USE_BOOST_MP -DCGAL_EIGEN3_ENABLED
 
 EIGEN_DIR = /usr/include/eigen3
 CGAL_VER := 6.0.3
@@ -13,7 +14,7 @@ INCLUDES := -I$(CGAL_DIR) -I$(BOOST_DIR) -I$(EIGEN_DIR)
 all: compute-bounding-box.exe
 
 compute-bounding-box.exe: bounding-onion.cpp
-	$(CXX) $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CXX) $(CFLAGS) $(INCLUDES) $(BUILD_FLAGS) $< -o $@
 
 CGAL-$(CGAL_VER).tar.xz:
 	curl -OL https://github.com/CGAL/cgal/releases/download/v$(CGAL_VER)/CGAL-$(CGAL_VER).tar.xz
