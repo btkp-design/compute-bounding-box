@@ -61,12 +61,6 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    // Check that the input file actually exists
-    if (!std::filesystem::exists(input_path)) {
-        std::cerr << "Error: Input file does not exist: " << input_path << std::endl;
-        return 1;
-    }
-
     // Ensure output directories exist
     auto obj_parent = std::filesystem::path(output_path_obj).parent_path();
     auto csv_parent = std::filesystem::path(output_path_csv).parent_path();
