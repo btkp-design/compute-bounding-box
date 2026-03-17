@@ -8,15 +8,8 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: compute-bounding-box
-            asset_name: compute-bounding-box-linux-amd64
+    name: Build
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -31,14 +24,11 @@ jobs:
       - name: Build release
         run: make dependencies compute-bounding-box.exe CXX=cosmoc++ CFLAGS="-O3"
 
-      - name: Rename artifact for upload
-        run: cp ${{ matrix.artifact_name }} ${{ matrix.asset_name }}
-
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.asset_name }}
-          path: ${{ matrix.asset_name }}
+          name: compute-bounding-box.exe
+          path: compute-bounding-box.exe
 
   release:
     name: Create GitHub Release
@@ -48,14 +38,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
+          name: compute-bounding-box.exe
           path: artifacts/
-          merge-multiple: true
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*
+          files: artifacts/compute-bounding-box.exe
           generate_release_notes: true
