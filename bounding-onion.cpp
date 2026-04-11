@@ -1,4 +1,3 @@
-// #include <boost/multiprecision/gmp.hpp>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/OBJ.h>
 #include <CGAL/IO/STL.h>
@@ -13,7 +12,6 @@
 #include <cstring>
 #include <filesystem>
 #include <vector>
-#include <sstream>
 #include <string>
 
 using K = CGAL::Exact_predicates_inexact_constructions_kernel;
@@ -29,7 +27,7 @@ std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
 }
 
 void printUsage() {
-    std::cerr << "Usage: ./compute-bounding-box.exe <input.obj> <output.obj> <output.csv>" << std::endl;
+    std::cerr << "Usage: ./compute-bounding-box.exe <input.obj> [<output.obj> <output.csv>]" << std::endl;
     std::cerr << "  <input.obj>   - Full path and filename of the input OBJ file" << std::endl;
     std::cerr << "  <output.obj>  - Full path and filename for the output OBJ file" << std::endl;
     std::cerr << "  <output.csv>  - Full path and filename for the output CSV file" << std::endl;
@@ -37,15 +35,17 @@ void printUsage() {
 
 int main(int argc, char** argv)
 {
-    if (argc != 4) {
+    if (argc != 2 && argc != 4) {
         std::cerr << "Error: Wrong number of arguments." << std::endl;
         printUsage();
         return 1;
     }
 
+    const bool output_to_stdout = argc == 2;
+
     const std::string input_path  = argv[1];
-    const std::string output_path_obj = argv[2];
-    const std::string output_path_csv = argv[3];
+    std::string output_path_obj;
+    std::string output_path_csv;
 
     // Validate that input path is not empty
     if (input_path.empty()) {
@@ -54,24 +54,30 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    // Validate that output paths are not empty
-    if (output_path_obj.empty() || output_path_csv.empty()) {
-        std::cerr << "Error: Output file paths cannot be empty." << std::endl;
-        printUsage();
-        return 1;
-    }
+    if (!output_to_stdout) {
+        output_path_obj = argv[2];
+        output_path_csv = argv[3];
 
-    // Ensure output directories exist
-    auto obj_parent = std::filesystem::path(output_path_obj).parent_path();
-    auto csv_parent = std::filesystem::path(output_path_csv).parent_path();
+        // Validate that output paths are not empty
+        if (output_path_obj.empty() || output_path_csv.empty()) {
+            std::cerr << "Error: Output file paths cannot be empty." << std::endl;
+            printUsage();
+            return 1;
+        }
 
-    if (!obj_parent.empty() && !std::filesystem::exists(obj_parent)) {
-        std::cerr << "Error: Output OBJ directory does not exist: " << obj_parent << std::endl;
-        return 1;
-    }
-    if (!csv_parent.empty() && !std::filesystem::exists(csv_parent)) {
-        std::cerr << "Error: Output CSV directory does not exist: " << csv_parent << std::endl;
-        return 1;
+        // Ensure output directories exist
+        auto obj_parent = std::filesystem::path(output_path_obj).parent_path();
+        auto csv_parent = std::filesystem::path(output_path_csv).parent_path();
+
+        if (!obj_parent.empty() && !std::filesystem::exists(obj_parent)) {
+            std::cerr << "Error: Output OBJ directory does not exist: " << obj_parent << std::endl;
+            return 1;
+        }
+        if (!csv_parent.empty() && !std::filesystem::exists(csv_parent)) {
+            std::cerr << "Error: Output CSV directory does not exist: " << csv_parent << std::endl;
+            return 1;
+        }
+
     }
 
     std::vector<K::Point_3> points_ref;
@@ -85,38 +91,40 @@ int main(int argc, char** argv)
     std::array<K::Point_3, 8> obb_points;
     CGAL::oriented_bounding_box(points_ref, obb_points);
 
-    // Print bounding box points to terminal
-    for (int i = 0; i < 8; i++) {
-        std::cout << "Point " << i << ": " << obb_points[i] << std::endl;
-    }
-
     // Construct and write OBB mesh
     Surface_mesh obb_sm;
     CGAL::make_hexahedron(obb_points[0], obb_points[1], obb_points[2], obb_points[3],
                           obb_points[4], obb_points[5], obb_points[6], obb_points[7], obb_sm);
     PMP::triangulate_faces(obb_sm);
 
-    if (!CGAL::IO::write_OBJ(output_path_obj, obb_sm)) {
-        std::cerr << "Error: Could not write OBJ file: " << output_path_obj << std::endl;
-        return 1;
-    }
-    std::cout << "OBJ written to: " << output_path_obj << std::endl;
-
-    // Write OBB points to CSV
-    try {
-        std::ofstream myFile(output_path_csv);
-        if (!myFile.is_open()) {
-            std::cerr << "Error: Could not open CSV file for writing: " << output_path_csv << std::endl;
+    if (output_to_stdout) {
+        if (!CGAL::IO::write_OBJ(std::cout, obb_sm)) {
+            std::cerr << "Error: Could not write OBJ file: " << output_path_obj << std::endl;
             return 1;
         }
-        myFile << obb_points[0] << "," << obb_points[1] << "," << obb_points[2] << "," << obb_points[3]
-               << "," << obb_points[4] << "," << obb_points[5] << "," << obb_points[6] << "," << obb_points[7];
-        myFile.close();
-        std::cout << "CSV written to: " << output_path_csv << std::endl;
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Error writing CSV: " << e.what() << std::endl;
-        return 1;
+    } else {
+        if (!CGAL::IO::write_OBJ(output_path_obj, obb_sm)) {
+            std::cerr << "Error: Could not write OBJ file: " << output_path_obj << std::endl;
+            return 1;
+        }
+        std::cout << "OBJ written to: " << output_path_obj << std::endl;
+
+        // Write OBB points to CSV
+        try {
+            std::ofstream myFile(output_path_csv);
+            if (!myFile.is_open()) {
+                std::cerr << "Error: Could not open CSV file for writing: " << output_path_csv << std::endl;
+                return 1;
+            }
+            myFile << obb_points[0] << "," << obb_points[1] << "," << obb_points[2] << "," << obb_points[3]
+                << "," << obb_points[4] << "," << obb_points[5] << "," << obb_points[6] << "," << obb_points[7];
+            myFile.close();
+            std::cout << "CSV written to: " << output_path_csv << std::endl;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error writing CSV: " << e.what() << std::endl;
+            return 1;
+        }
     }
 
     return 0;
