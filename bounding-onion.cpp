@@ -99,7 +99,7 @@ int main(int argc, char** argv)
 
     if (output_to_stdout) {
         if (!CGAL::IO::write_OBJ(std::cout, obb_sm)) {
-            std::cerr << "Error: Could not write OBJ file: " << output_path_obj << std::endl;
+            std::cerr << "Error: Could not write OBJ file to stdout" << std::endl;
             return 1;
         }
     } else {
